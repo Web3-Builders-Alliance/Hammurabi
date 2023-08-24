@@ -116,6 +116,7 @@ impl<'info> Withdraw<'info> {
         
         let seeds = &[
             &b"auth"[..],
+            &self.auth.key.as_ref(),
             &[self.config.auth_bump],
         ];
 

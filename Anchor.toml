@@ -2,14 +2,14 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-hammurabi = "8DwQdN5EgawTVRMho4FV7p6HbbQzwNZ32kE3SuwsecDA"
+hammurabi = "H3A3dW2o2q27neM6yDaB3cJDpAuNU1PuQxbSrtJjyn7v"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
 cluster = "Localnet"
-wallet = "/Users/leo/.config/solana/id.json"
+wallet = "/Users/elon/.config/solana/id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

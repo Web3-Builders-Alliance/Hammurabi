@@ -15,7 +15,7 @@ describe("anchor-amm-2023", () => {
   // Configure the client to use the local cluster.
   anchor.setProvider(anchor.AnchorProvider.env());
 
-  const programId = new PublicKey("8DwQdN5EgawTVRMho4FV7p6HbbQzwNZ32kE3SuwsecDA");
+  const programId = new PublicKey("H3A3dW2o2q27neM6yDaB3cJDpAuNU1PuQxbSrtJjyn7v");
   const program = new anchor.Program<Hammurabi>(IDL, programId, anchor.getProvider());
 
   // Set up our keys
@@ -26,9 +26,10 @@ describe("anchor-amm-2023", () => {
   const seed2 = new BN(randomBytes(8));
 
   // PDAs
-  const auth = PublicKey.findProgramAddressSync([Buffer.from("auth")], program.programId)[0];
   const config1 = PublicKey.findProgramAddressSync([Buffer.from("config"), seed1.toBuffer().reverse()], program.programId)[0];
   const config2 = PublicKey.findProgramAddressSync([Buffer.from("config"), seed2.toBuffer().reverse()], program.programId)[0];
+  const auth1 = PublicKey.findProgramAddressSync([Buffer.from("auth"), config1.toBuffer()], program.programId)[0];
+  const auth2 = PublicKey.findProgramAddressSync([Buffer.from("auth"), config2.toBuffer()], program.programId)[0];
 
   // Mints
   let mint_x: PublicKey;
@@ -41,21 +42,19 @@ describe("anchor-amm-2023", () => {
   // ATAs
   let initializer_x_ata: PublicKey;
   let initializer_y_ata: PublicKey;
-  let initializer_x_ata2: PublicKey;
-  let initializer_y_ata2: PublicKey;
+  let initializer_z_ata: PublicKey;
 
   let initializer_lp_ata: PublicKey;
   let initializer_lp_ata2: PublicKey;
   // let user_x_ata: PublicKey;
   // let user_y_ata: PublicKey;
   // let user_lp_ata: PublicKey;
-  let vault_x_ata: PublicKey;
+  let vault_x1_ata: PublicKey;
   let vault_y_ata: PublicKey;
-  let vault_x_ata2: PublicKey;
-  let vault_y_ata2: PublicKey;
+  let vault_x2_ata: PublicKey;
+  let vault_z_ata: PublicKey;
   let vault_lp_ata: PublicKey;
   let vault_lp_ata2: PublicKey;
-
     
   it("Airdrop", async () => {
     await Promise.all([initializer, user].map(async (k) => {
@@ -72,19 +71,18 @@ describe("anchor-amm-2023", () => {
     mint_y2 = u3.mint;
     initializer_x_ata = u1.ata;
     initializer_y_ata = u2.ata;
-    initializer_x_ata2 = u1.ata;
-    initializer_y_ata2 = u3.ata;
+    initializer_z_ata = u3.ata;
 
     initializer_lp_ata = await getAssociatedTokenAddress(mint_lp, initializer.publicKey, false, tokenProgram);
     initializer_lp_ata2 = await getAssociatedTokenAddress(mint_lp2, initializer.publicKey, false, tokenProgram);
     // Create take ATAs
-    vault_x_ata = await getAssociatedTokenAddress(mint_x, auth, true, tokenProgram);
-    vault_y_ata = await getAssociatedTokenAddress(mint_y, auth, true, tokenProgram);
-    vault_x_ata2 = await getAssociatedTokenAddress(mint_x2, auth, true, tokenProgram);
-    vault_y_ata2 = await getAssociatedTokenAddress(mint_y2, auth, true, tokenProgram);
+    vault_x1_ata = await getAssociatedTokenAddress(mint_x, auth1, true, tokenProgram);
+    vault_y_ata = await getAssociatedTokenAddress(mint_y, auth1, true, tokenProgram);
+    vault_x2_ata = await getAssociatedTokenAddress(mint_x2, auth2, true, tokenProgram);
+    vault_z_ata = await getAssociatedTokenAddress(mint_y2, auth2, true, tokenProgram);
 
-    vault_lp_ata = await getAssociatedTokenAddress(mint_lp, auth, true, tokenProgram);
-    vault_lp_ata2 = await getAssociatedTokenAddress(mint_lp2, auth, true, tokenProgram);
+    vault_lp_ata = await getAssociatedTokenAddress(mint_lp, auth1, true, tokenProgram);
+    vault_lp_ata2 = await getAssociatedTokenAddress(mint_lp2, auth2, true, tokenProgram);
     // user_x_ata = await getAssociatedTokenAddress(mint_x, user.publicKey, false, tokenProgram);
     // user_y_ata = await getAssociatedTokenAddress(mint_y, user.publicKey, false, tokenProgram);
     // user_lp_ata = await getAssociatedTokenAddress(mint_lp, user.publicKey, false, tokenProgram);
@@ -101,12 +99,12 @@ describe("anchor-amm-2023", () => {
         initializer.publicKey
       )
       .accounts({
-        auth,
+        auth:auth1,
         initializer: initializer.publicKey,
         mintX: mint_x,
         mintY: mint_y,
         mintLp: mint_lp,
-        vaultX: vault_x_ata,
+        vaultX: vault_x1_ata,
         vaultY: vault_y_ata,
         config: config1,
         tokenProgram: TOKEN_PROGRAM_ID,
@@ -131,13 +129,13 @@ describe("anchor-amm-2023", () => {
         initializer.publicKey
       )
       .accounts({
-        auth,
+        auth: auth2,
         initializer: initializer.publicKey,
         mintX: mint_x2,
         mintY: mint_y2,
         mintLp: mint_lp2,
-        vaultX: vault_x_ata2,
-        vaultY: vault_y_ata2,
+        vaultX: vault_x2_ata,
+        vaultY: vault_z_ata,
         config: config2,
         tokenProgram: TOKEN_PROGRAM_ID,
         associatedTokenProgram: ASSOCIATED_PROGRAM_ID,

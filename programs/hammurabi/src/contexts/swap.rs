@@ -38,8 +38,8 @@ pub struct Swap<'info> {
         associated_token::authority = auth
     )]
     pub vault_y: Box<Account<'info, TokenAccount>>,
-    ///CHECKED: This is not dangerous. It's just used for signing.
-    #[account(seeds = [b"auth"], bump = config.auth_bump)]
+    /// CHECK: just a pda for signing
+    #[account(seeds = [b"auth", config.key().as_ref()], bump = config.auth_bump)]
     pub auth: UncheckedAccount<'info>,
     #[account(
         has_one = mint_x,
@@ -131,6 +131,7 @@ impl<'info> Swap<'info> {
 
         let seeds = &[
             &b"auth"[..],
+            &self.auth.key.as_ref(),
             &[self.config.auth_bump],
         ];
 

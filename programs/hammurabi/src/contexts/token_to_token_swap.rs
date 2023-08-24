@@ -10,70 +10,66 @@ use crate::errors::AmmError;
 pub struct TokenToTokenSwap<'info> {
     #[account(mut)]
     pub user: Signer<'info>,
-    pub mint_x_1: Box<Account<'info, Mint>>,
-    pub mint_y_1: Box<Account<'info, Mint>>,
+    // Base currency: SOL/USDC
+    pub mint_x: Box<Account<'info, Mint>>,
+    // Trade currency: SPL Token
+    pub mint_y: Box<Account<'info, Mint>>,
+    // Counter-trade currency: SPL Token
+    pub mint_z: Box<Account<'info, Mint>>,
     #[account(
         init_if_needed,
         payer = user,
-        associated_token::mint = mint_x_1,
+        associated_token::mint = mint_x,
         associated_token::authority = user
     )]
-    pub user_x_1: Box<Account<'info, TokenAccount>>,
+    pub user_x: Box<Account<'info, TokenAccount>>,
     #[account(
         init_if_needed,
         payer = user,
-        associated_token::mint = mint_y_1,
+        associated_token::mint = mint_y,
         associated_token::authority = user
     )]
-    pub user_y_1: Box<Account<'info, TokenAccount>>,
-    #[account(
-        mut,
-        associated_token::mint = mint_x_1,
-        associated_token::authority = auth
-    )]
-    pub vault_x_1: Box<Account<'info, TokenAccount>>,
-    #[account(
-        mut,
-        associated_token::mint = mint_y_1,
-        associated_token::authority = auth
-    )]
-    pub vault_y_1: Box<Account<'info, TokenAccount>>,
-
-    pub mint_x_2: Box<Account<'info, Mint>>,
-    pub mint_y_2: Box<Account<'info, Mint>>,
+    pub user_y: Box<Account<'info, TokenAccount>>,
     #[account(
         init_if_needed,
         payer = user,
-        associated_token::mint = mint_x_2,
+        associated_token::mint = mint_z,
         associated_token::authority = user
     )]
-    pub user_x_2: Box<Account<'info, TokenAccount>>,
-    #[account(
-        init_if_needed,
-        payer = user,
-        associated_token::mint = mint_y_2,
-        associated_token::authority = user
-    )]
-    pub user_y_2: Box<Account<'info, TokenAccount>>,
+    pub user_z: Box<Account<'info, TokenAccount>>,
     #[account(
         mut,
-        associated_token::mint = mint_x_2,
-        associated_token::authority = auth
+        associated_token::mint = mint_x,
+        associated_token::authority = auth1
     )]
-    pub vault_x_2: Box<Account<'info, TokenAccount>>,
+    pub vault_x1: Box<Account<'info, TokenAccount>>,
     #[account(
         mut,
-        associated_token::mint = mint_y_2,
-        associated_token::authority = auth
+        associated_token::mint = mint_x,
+        associated_token::authority = auth2
     )]
-    pub vault_y_2: Box<Account<'info, TokenAccount>>,
-
-    ///CHECKED: This is not dangerous. It's just used for signing.
-    #[account(seeds = [b"auth"], bump = config1.auth_bump)]
-    pub auth: UncheckedAccount<'info>,
+    pub vault_x2: Box<Account<'info, TokenAccount>>,
     #[account(
-        constraint = config1.mint_x == mint_x_1.key(),
-        constraint = config1.mint_y == mint_y_1.key(),
+        mut,
+        associated_token::mint = mint_y,
+        associated_token::authority = auth1
+    )]
+    pub vault_y: Box<Account<'info, TokenAccount>>,
+    #[account(
+        mut,
+        associated_token::mint = mint_z,
+        associated_token::authority = auth2
+    )]
+    pub vault_z: Box<Account<'info, TokenAccount>>,
+    /// CHECK: just a pda for signing
+    #[account(seeds = [b"auth", config1.key().as_ref()], bump = config1.auth_bump)]
+    pub auth1: UncheckedAccount<'info>,
+    /// CHECK: just a pda for signing
+    #[account(seeds = [b"auth", config2.key().as_ref()], bump = config2.auth_bump)]
+    pub auth2: UncheckedAccount<'info>,
+    #[account(
+        constraint = config1.mint_x == mint_x.key(),
+        constraint = config1.mint_y == mint_y.key(),
         seeds = [
             b"config",
             config1.seed.to_le_bytes().as_ref()
@@ -82,8 +78,8 @@ pub struct TokenToTokenSwap<'info> {
     )]
     pub config1: Account<'info, Config>,
     #[account(
-        constraint = config2.mint_x == mint_x_2.key(),
-        constraint = config2.mint_y == mint_y_2.key(),
+        constraint = config2.mint_x == mint_x.key(),
+        constraint = config2.mint_y == mint_z.key(),
         seeds = [
             b"config",
             config2.seed.to_le_bytes().as_ref()
@@ -111,17 +107,17 @@ impl<'info> TokenToTokenSwap<'info> {
         assert_non_zero!([amount]);
 
         let mut curve_1 = ConstantProduct::init(
-            self.vault_x_1.amount,
-            self.vault_y_1.amount,
-            self.vault_x_1.amount,
+            self.vault_x1.amount,
+            self.vault_y.amount,
+            self.vault_x1.amount,
             self.config1.fee,
             None
         ).map_err(AmmError::from)?;
 
         let mut curve_2 = ConstantProduct::init(
-            self.vault_x_2.amount,
-            self.vault_y_2.amount,
-            self.vault_x_2.amount,
+            self.vault_x2.amount,
+            self.vault_z.amount,
+            self.vault_x2.amount,
             self.config2.fee,
             None
         ).map_err(AmmError::from)?;
@@ -156,8 +152,8 @@ impl<'info> TokenToTokenSwap<'info> {
         amount: u64,
     ) -> Result<()> {
         let (from, to) = match is_x {
-            true => (self.user_x_1.to_account_info(), self.vault_x_1.to_account_info()),
-            false => (self.user_y_1.to_account_info(), self.vault_y_1.to_account_info())
+            true => (self.user_x.to_account_info(), self.vault_x1.to_account_info()),
+            false => (self.user_y.to_account_info(), self.vault_y.to_account_info())
         };
 
         let accounts = Transfer {
@@ -182,23 +178,24 @@ impl<'info> TokenToTokenSwap<'info> {
     ) -> Result<()> {
         let (from, to) = match is_x {
             true => match intermidiate_is_x {
-                true => (self.user_y_1.to_account_info(), self.vault_x_2.to_account_info()),
-                false => (self.user_y_1.to_account_info(), self.vault_y_2.to_account_info())
+                true => (self.user_y.to_account_info(), self.vault_x2.to_account_info()),
+                false => (self.user_y.to_account_info(), self.vault_z.to_account_info())
             }
             false => match intermidiate_is_x {
-                true => (self.user_x_1.to_account_info(), self.vault_x_2.to_account_info()),
-                false => (self.user_x_1.to_account_info(), self.vault_y_2.to_account_info())
+                true => (self.user_x.to_account_info(), self.vault_x2.to_account_info()),
+                false => (self.user_x.to_account_info(), self.vault_z.to_account_info())
             }
         };
 
         let accounts = Transfer {
             from,
             to,
-            authority: self.auth.to_account_info()
+            authority: self.auth1.to_account_info()
         };
 
         let seeds = &[
             &b"auth"[..],
+            &self.auth1.key.as_ref(),
             &[self.config1.auth_bump],
         ];
 
@@ -220,18 +217,19 @@ impl<'info> TokenToTokenSwap<'info> {
     ) -> Result<()> {
         
         let (from, to) = match intermidiate_is_x {
-            true => (self.vault_y_2.to_account_info(), self.user_y_2.to_account_info()),
-            false => (self.vault_x_2.to_account_info(), self.user_x_2.to_account_info())
+            true => (self.vault_z.to_account_info(), self.user_y.to_account_info()),
+            false => (self.vault_x2.to_account_info(), self.user_x.to_account_info())
         };
 
         let accounts = Transfer {
             from,
             to,
-            authority: self.auth.to_account_info()
+            authority: self.auth2.to_account_info()
         };
 
         let seeds = &[
             &b"auth"[..],
+            &self.auth2.key.as_ref(),
             &[self.config2.auth_bump],
         ];
 
