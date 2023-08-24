@@ -37,7 +37,7 @@ pub struct Initialize<'info> {
     )]
     pub vault_y: Account<'info, TokenAccount>,
     /// CHECK: This is safe because it's just used to sign
-    #[account(seeds = [b"auth"], bump)]
+    #[account(seeds = [b"auth", config.key().as_ref()], bump)]
     pub auth: UncheckedAccount<'info>,
     #[account(
         init, 

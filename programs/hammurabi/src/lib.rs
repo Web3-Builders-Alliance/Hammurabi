@@ -7,7 +7,7 @@ mod state;
 mod errors;
 mod helpers;
 
-declare_id!("8DwQdN5EgawTVRMho4FV7p6HbbQzwNZ32kE3SuwsecDA");
+declare_id!("H3A3dW2o2q27neM6yDaB3cJDpAuNU1PuQxbSrtJjyn7v");
 
 #[program]
 pub mod hammurabi {
@@ -54,6 +54,18 @@ pub mod hammurabi {
     ) -> Result<()> {
         // Swap Token X for Token Y or vice versa
         ctx.accounts.swap(is_x, amount, min, expiration)
+    }
+
+    pub fn token_to_token_swap(
+        ctx: Context<TokenToTokenSwap>,
+        is_x: bool,
+        is_intermidiate_x: bool,
+        amount: u64, // Amount of tokens we deposit
+        min: u64, // Minimum amount of tokens I'd be willing to withdraw
+        expiration: i64
+    ) -> Result<()> {
+        // Swap Token X for Token Y passing from another Token
+        ctx.accounts.token_to_token_swap(is_x, is_intermidiate_x, amount, min, expiration)
     }
 
     pub fn lock(
