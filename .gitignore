@@ -1,7 +1,7 @@
 .anchor
 .DS_Store
 target/*
-!target/hammurabi-keypair.json
+!target/deploy/hammurabi-keypair.json
 **/*.rs.bk
 node_modules
 test-ledger
