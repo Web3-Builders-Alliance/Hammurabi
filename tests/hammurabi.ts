@@ -15,7 +15,7 @@ describe("anchor-amm-2023", () => {
   // Configure the client to use the local cluster.
   anchor.setProvider(anchor.AnchorProvider.env());
 
-  const programId = new PublicKey("H3A3dW2o2q27neM6yDaB3cJDpAuNU1PuQxbSrtJjyn7v");
+  const programId = new PublicKey("ammmDN4bVS1pFRNc9SoH1bFbdJJcmnsNgmeoU6KhLag");
   const program = new anchor.Program<Hammurabi>(IDL, programId, anchor.getProvider());
 
   // Set up our keys
