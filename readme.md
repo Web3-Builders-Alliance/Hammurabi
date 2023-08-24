@@ -6,7 +6,7 @@ Some basic ground rules in order to keep our tests, `Anchor.toml` and `lib.rs` i
 
 ### 1. Create a symlink to your wallet
 Make sure to create a symlink to your Solana keypair in the root directory, like so:
-`ln -s /solana-id.json /Users/dean/.config/solana/id.json ./wallet.json`
+`ln -s /Users/dean/.config/solana/id.json ./wallet.json`
 
 While this wallet won't be committed to the repo as it is currently included in the `.gitignore`, so your funds should be `#SAFU`, it is recommended to spin up a new, specific wallet that you don't care about just for testing just in case.
 
