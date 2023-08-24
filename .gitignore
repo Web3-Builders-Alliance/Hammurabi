@@ -1,8 +1,9 @@
-
 .anchor
 .DS_Store
-target
+target/*
+!target/hammurabi-keypair.json
 **/*.rs.bk
 node_modules
 test-ledger
 .yarn
+wallet.json

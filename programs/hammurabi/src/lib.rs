@@ -7,7 +7,7 @@ mod state;
 mod errors;
 mod helpers;
 
-declare_id!("H3A3dW2o2q27neM6yDaB3cJDpAuNU1PuQxbSrtJjyn7v");
+declare_id!("ammmDN4bVS1pFRNc9SoH1bFbdJJcmnsNgmeoU6KhLag");
 
 #[program]
 pub mod hammurabi {
