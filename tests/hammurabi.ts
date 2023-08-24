@@ -22,27 +22,40 @@ describe("anchor-amm-2023", () => {
   const [initializer, user] = [new Keypair(), new Keypair()];
 
   // Random seed
-  const seed = new BN(randomBytes(8));
+  const seed1 = new BN(randomBytes(8));
+  const seed2 = new BN(randomBytes(8));
 
   // PDAs
   const auth = PublicKey.findProgramAddressSync([Buffer.from("auth")], program.programId)[0];
-  const config = PublicKey.findProgramAddressSync([Buffer.from("config"), seed.toBuffer().reverse()], program.programId)[0];
+  const config1 = PublicKey.findProgramAddressSync([Buffer.from("config"), seed1.toBuffer().reverse()], program.programId)[0];
+  const config2 = PublicKey.findProgramAddressSync([Buffer.from("config"), seed2.toBuffer().reverse()], program.programId)[0];
 
   // Mints
   let mint_x: PublicKey;
   let mint_y: PublicKey;
-  let mint_lp = PublicKey.findProgramAddressSync([Buffer.from("lp"), config.toBuffer()], program.programId)[0];
+  let mint_x2: PublicKey;
+  let mint_y2: PublicKey;
+  let mint_lp = PublicKey.findProgramAddressSync([Buffer.from("lp"), config1.toBuffer()], program.programId)[0];
+  let mint_lp2 = PublicKey.findProgramAddressSync([Buffer.from("lp"), config2.toBuffer()], program.programId)[0];
 
   // ATAs
   let initializer_x_ata: PublicKey;
   let initializer_y_ata: PublicKey;
+  let initializer_x_ata2: PublicKey;
+  let initializer_y_ata2: PublicKey;
+
   let initializer_lp_ata: PublicKey;
+  let initializer_lp_ata2: PublicKey;
   // let user_x_ata: PublicKey;
   // let user_y_ata: PublicKey;
   // let user_lp_ata: PublicKey;
   let vault_x_ata: PublicKey;
   let vault_y_ata: PublicKey;
+  let vault_x_ata2: PublicKey;
+  let vault_y_ata2: PublicKey;
   let vault_lp_ata: PublicKey;
+  let vault_lp_ata2: PublicKey;
+
     
   it("Airdrop", async () => {
     await Promise.all([initializer, user].map(async (k) => {
@@ -52,16 +65,26 @@ describe("anchor-amm-2023", () => {
 
   it("Create mints, tokens and ATAs", async () => {
     // Create mints and ATAs
-    let [ u1, u2 ] = await Promise.all([initializer, initializer].map(async(a) => { return await newMintToAta(anchor.getProvider().connection, a) }))
+    let [ u1, u2, u3 ] = await Promise.all([initializer, initializer, initializer].map(async(a) => { return await newMintToAta(anchor.getProvider().connection, a) }))
     mint_x = u1.mint;
     mint_y = u2.mint;
+    mint_x2 = u1.mint;
+    mint_y2 = u3.mint;
     initializer_x_ata = u1.ata;
     initializer_y_ata = u2.ata;
+    initializer_x_ata2 = u1.ata;
+    initializer_y_ata2 = u3.ata;
+
     initializer_lp_ata = await getAssociatedTokenAddress(mint_lp, initializer.publicKey, false, tokenProgram);
+    initializer_lp_ata2 = await getAssociatedTokenAddress(mint_lp2, initializer.publicKey, false, tokenProgram);
     // Create take ATAs
     vault_x_ata = await getAssociatedTokenAddress(mint_x, auth, true, tokenProgram);
     vault_y_ata = await getAssociatedTokenAddress(mint_y, auth, true, tokenProgram);
+    vault_x_ata2 = await getAssociatedTokenAddress(mint_x2, auth, true, tokenProgram);
+    vault_y_ata2 = await getAssociatedTokenAddress(mint_y2, auth, true, tokenProgram);
+
     vault_lp_ata = await getAssociatedTokenAddress(mint_lp, auth, true, tokenProgram);
+    vault_lp_ata2 = await getAssociatedTokenAddress(mint_lp2, auth, true, tokenProgram);
     // user_x_ata = await getAssociatedTokenAddress(mint_x, user.publicKey, false, tokenProgram);
     // user_y_ata = await getAssociatedTokenAddress(mint_y, user.publicKey, false, tokenProgram);
     // user_lp_ata = await getAssociatedTokenAddress(mint_lp, user.publicKey, false, tokenProgram);
@@ -73,7 +96,7 @@ describe("anchor-amm-2023", () => {
   it("Initialize", async () => {
     try {
       const tx = await program.methods.initialize(
-        seed,
+        seed1,
         0,
         initializer.publicKey
       )
@@ -85,7 +108,7 @@ describe("anchor-amm-2023", () => {
         mintLp: mint_lp,
         vaultX: vault_x_ata,
         vaultY: vault_y_ata,
-        config,
+        config: config1,
         tokenProgram: TOKEN_PROGRAM_ID,
         associatedTokenProgram: ASSOCIATED_PROGRAM_ID,
         systemProgram: SystemProgram.programId
@@ -100,6 +123,37 @@ describe("anchor-amm-2023", () => {
     }
   });
 
+  it("Initialize2", async () => {
+    try {
+      const tx = await program.methods.initialize(
+        seed2,
+        0,
+        initializer.publicKey
+      )
+      .accounts({
+        auth,
+        initializer: initializer.publicKey,
+        mintX: mint_x2,
+        mintY: mint_y2,
+        mintLp: mint_lp2,
+        vaultX: vault_x_ata2,
+        vaultY: vault_y_ata2,
+        config: config2,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_PROGRAM_ID,
+        systemProgram: SystemProgram.programId
+      })
+      .signers([
+        initializer
+      ]).rpc();
+      await confirmTx(tx);
+      console.log("Your transaction signature", tx);
+    } catch(e) {
+      console.error(e);
+    }
+  });
+
+/*
   it("Lock", async () => {
     try {
       const tx = await program.methods.lock()
@@ -330,6 +384,7 @@ describe("anchor-amm-2023", () => {
     }
   });
 });
+*/
 
 // Helpers
 const confirmTx = async (signature: string) => {
@@ -357,4 +412,5 @@ const newMintToAta = async (connection, minter: Keypair): Promise<{ mint: Public
     mint,
     ata
   }
-}
+
+}});
