@@ -121,6 +121,45 @@ describe("anchor-amm-2023", () => {
     }
   });
 
+  it ("Fund the Pool", async () => {
+    try {
+      const tx = await program.methods.deposit(
+        new BN(20),
+        new BN(20),
+        new BN(30),
+        new BN(Math.floor(new Date().getTime()/1000) + 600)
+      )
+      .accountsStrict({
+        auth: auth1,
+        user: initializer.publicKey,
+        mintX: mint_x,
+        mintY: mint_y,
+        mintLp: mint_lp,
+        userX: initializer_x_ata,
+        userY: initializer_y_ata,
+        userLp: initializer_lp_ata,
+        vaultX: vault_x1_ata,
+        vaultY: vault_y_ata,
+        config: config1,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_PROGRAM_ID,
+        systemProgram: SystemProgram.programId
+      })
+      .signers([
+        initializer
+      ]).rpc();
+      await confirmTx(tx);
+      console.log("Your deposit transaction signature", tx);
+    } catch(e) {
+      let err = e as anchor.AnchorError;
+      console.error(e);
+      if(err.error.errorCode.code !== "InvalidAuthority") {
+        throw (e)
+      }
+    }
+  });
+
+
   it("Initialize2", async () => {
     try {
       const tx = await program.methods.initialize(
@@ -150,6 +189,84 @@ describe("anchor-amm-2023", () => {
       console.error(e);
     }
   });
+
+  it ("Fund the Pool 2", async () => {
+    try {
+      const tx = await program.methods.deposit(
+        new BN(20),
+        new BN(20),
+        new BN(30),
+        new BN(Math.floor(new Date().getTime()/1000) + 600)
+      )
+      .accountsStrict({
+        auth: auth2,
+        user: initializer.publicKey,
+        mintX: mint_x2,
+        mintY: mint_y2,
+        mintLp: mint_lp2,
+        userX: initializer_x_ata,
+        userY: initializer_z_ata,
+        userLp: initializer_lp_ata2,
+        vaultX: vault_x2_ata,
+        vaultY: vault_z_ata,
+        config: config2,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_PROGRAM_ID,
+        systemProgram: SystemProgram.programId
+      })
+      .signers([
+        initializer
+      ]).rpc();
+      await confirmTx(tx);
+      console.log("Your deposit transaction signature", tx);
+    } catch(e) {
+      let err = e as anchor.AnchorError;
+      console.error(e);
+      if(err.error.errorCode.code !== "InvalidAuthority") {
+        throw (e)
+      }
+    }
+  });
+
+  it ("Token to Token Swap", async () => {
+    try {
+      const tx = await program.methods.tokenToTokenSwap(
+        new BN(100),
+        new BN(0),
+        new BN(Math.floor(new Date().getTime()/1000) + 600),
+      )
+      .accounts({
+        auth1: auth1,
+        auth2: auth2,
+        user: initializer.publicKey,
+        mintX: mint_x,
+        mintY: mint_y,
+        mintZ: mint_y2,
+        userX: initializer_x_ata,
+        userY: initializer_y_ata,
+        userZ: initializer_z_ata,
+        vault1X: vault_x1_ata,
+        vault2X: vault_x2_ata,
+        vaultY: vault_y_ata,
+        vaultZ: vault_z_ata,
+        config1: config1,
+        config2: config2,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_PROGRAM_ID,
+        systemProgram: SystemProgram.programId
+      })
+      .signers([
+        initializer
+      ]).rpc();
+      await confirmTx(tx);
+      console.log("Your transaction signature", tx);
+    } catch(e) {
+      console.error(e);
+    }
+  });
+
+
+        
 
 /*
   it("Lock", async () => {
