@@ -42,7 +42,7 @@ pub struct Initialize<'info> {
     #[account(
         init, 
         payer = initializer, 
-        seeds = [b"config", seed.to_le_bytes().as_ref()], 
+        seeds = [b"config", mint_x.key().as_ref(), mint_y.key().as_ref()], 
         bump,
         space = Config::LEN
     )]
