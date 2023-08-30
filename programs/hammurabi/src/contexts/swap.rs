@@ -128,7 +128,7 @@ impl<'info> Swap<'info> {
 
         let seeds = &[
             &b"auth"[..],
-            &self.auth.key.as_ref(),
+            &self.config.key().clone().to_bytes(),
             &[self.config.auth_bump],
         ];
 

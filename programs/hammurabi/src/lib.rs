@@ -58,14 +58,12 @@ pub mod hammurabi {
 
     pub fn token_to_token_swap(
         ctx: Context<TokenToTokenSwap>,
-        is_x: bool,
-        is_intermidiate_x: bool,
         amount: u64, // Amount of tokens we deposit
         min: u64, // Minimum amount of tokens I'd be willing to withdraw
         expiration: i64
     ) -> Result<()> {
         // Swap Token X for Token Y passing from another Token
-        ctx.accounts.token_to_token_swap(is_x, is_intermidiate_x, amount, min, expiration)
+        ctx.accounts.token_to_token_swap(amount, min, expiration)
     }
 
     pub fn lock(

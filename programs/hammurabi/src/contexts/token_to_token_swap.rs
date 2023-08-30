@@ -42,13 +42,13 @@ pub struct TokenToTokenSwap<'info> {
         associated_token::mint = mint_x,
         associated_token::authority = auth1
     )]
-    pub vault_x1: Box<Account<'info, TokenAccount>>,
+    pub vault1_x: Box<Account<'info, TokenAccount>>,
     #[account(
         mut,
         associated_token::mint = mint_x,
         associated_token::authority = auth2
     )]
-    pub vault_x2: Box<Account<'info, TokenAccount>>,
+    pub vault2_x: Box<Account<'info, TokenAccount>>,
     #[account(
         mut,
         associated_token::mint = mint_y,
@@ -89,8 +89,6 @@ pub struct TokenToTokenSwap<'info> {
 impl<'info> TokenToTokenSwap<'info> {
     pub fn token_to_token_swap(
         &mut self,
-        is_x: bool,
-        intermidiate_is_x: bool,
         amount: u64,
         min: u64,
         expiration: i64
@@ -101,54 +99,44 @@ impl<'info> TokenToTokenSwap<'info> {
         assert_non_zero!([amount]);
 
         let mut curve_1 = ConstantProduct::init(
-            self.vault_x1.amount,
+            self.vault1_x.amount,
             self.vault_y.amount,
-            self.vault_x1.amount,
+            self.vault1_x.amount,
             self.config1.fee,
             None
         ).map_err(AmmError::from)?;
 
         let mut curve_2 = ConstantProduct::init(
-            self.vault_x2.amount,
+            self.vault2_x.amount,
             self.vault_z.amount,
-            self.vault_x2.amount,
+            self.vault2_x.amount,
             self.config2.fee,
             None
         ).map_err(AmmError::from)?;
 
-        let p_1 = match is_x {
-            true => LiquidityPair::X,
-            false => LiquidityPair::Y
-        };
+        let p_1 = LiquidityPair::Y;
 
-        let p_2 = match intermidiate_is_x {
-            true => LiquidityPair::X,
-            false => LiquidityPair::Y
-        };
+        let p_2 = LiquidityPair::X;
 
         let res_1 = curve_1.swap(p_1, amount, min).map_err(AmmError::from)?;
 
         assert_non_zero!([res_1.deposit, res_1.withdraw]);
-        self.deposit_token(is_x, res_1.deposit)?;
+        self.deposit_token(res_1.deposit)?;
 
         let res_2 = curve_2.swap(p_2, res_1.withdraw, min).map_err(AmmError::from)?;
 
         assert_non_zero!([res_2.deposit, res_2.withdraw]);
-        self.intermiadiate_exchange(is_x, intermidiate_is_x, res_2.deposit)?;
-        self.withdraw_token(intermidiate_is_x, res_2.withdraw)?;
+        self.intermiadiate_exchange( res_2.deposit)?;
+        self.withdraw_token( res_2.withdraw)?;
 
         Ok(())
     }
 
     pub fn deposit_token(
         &mut self,
-        is_x: bool,
         amount: u64,
     ) -> Result<()> {
-        let (from, to) = match is_x {
-            true => (self.user_x.to_account_info(), self.vault_x1.to_account_info()),
-            false => (self.user_y.to_account_info(), self.vault_y.to_account_info())
-        };
+        let (from, to) = (self.user_y.to_account_info(), self.vault_y.to_account_info());
 
         let accounts = Transfer {
             from,
@@ -166,20 +154,9 @@ impl<'info> TokenToTokenSwap<'info> {
 
     pub fn intermiadiate_exchange(
         &mut self,
-        is_x: bool,
-        intermidiate_is_x: bool,
         amount: u64
     ) -> Result<()> {
-        let (from, to) = match is_x {
-            true => match intermidiate_is_x {
-                true => (self.user_y.to_account_info(), self.vault_x2.to_account_info()),
-                false => (self.user_y.to_account_info(), self.vault_z.to_account_info())
-            }
-            false => match intermidiate_is_x {
-                true => (self.user_x.to_account_info(), self.vault_x2.to_account_info()),
-                false => (self.user_x.to_account_info(), self.vault_z.to_account_info())
-            }
-        };
+        let (from, to) = (self.vault1_x.to_account_info(), self.vault2_x.to_account_info());
 
         let accounts = Transfer {
             from,
@@ -189,7 +166,7 @@ impl<'info> TokenToTokenSwap<'info> {
 
         let seeds = &[
             &b"auth"[..],
-            &self.auth1.key.as_ref(),
+            &self.config1.key().clone().to_bytes(),
             &[self.config1.auth_bump],
         ];
 
@@ -206,14 +183,10 @@ impl<'info> TokenToTokenSwap<'info> {
 
     pub fn withdraw_token(
         &mut self,
-        intermidiate_is_x: bool,
         amount: u64,
     ) -> Result<()> {
         
-        let (from, to) = match intermidiate_is_x {
-            true => (self.vault_z.to_account_info(), self.user_y.to_account_info()),
-            false => (self.vault_x2.to_account_info(), self.user_x.to_account_info())
-        };
+        let (from, to) = (self.vault_z.to_account_info(), self.user_z.to_account_info());
 
         let accounts = Transfer {
             from,
@@ -223,7 +196,7 @@ impl<'info> TokenToTokenSwap<'info> {
 
         let seeds = &[
             &b"auth"[..],
-            &self.auth2.key.as_ref(),
+            &self.config2.key().clone().to_bytes(),
             &[self.config2.auth_bump],
         ];
 
