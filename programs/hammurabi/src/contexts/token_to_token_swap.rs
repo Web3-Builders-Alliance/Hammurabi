@@ -70,20 +70,14 @@ pub struct TokenToTokenSwap<'info> {
     #[account(
         constraint = config1.mint_x == mint_x.key(),
         constraint = config1.mint_y == mint_y.key(),
-        seeds = [
-            b"config",
-            config1.seed.to_le_bytes().as_ref()
-        ],
+        seeds = [b"config", mint_x.key().as_ref(), mint_y.key().as_ref()],
         bump = config1.config_bump,
     )]
     pub config1: Account<'info, Config>,
     #[account(
         constraint = config2.mint_x == mint_x.key(),
         constraint = config2.mint_y == mint_z.key(),
-        seeds = [
-            b"config",
-            config2.seed.to_le_bytes().as_ref()
-        ],
+        seeds = [b"config", mint_x.key().as_ref(), mint_z.key().as_ref()],
         bump = config2.config_bump,
     )]
     pub config2: Account<'info, Config>,
