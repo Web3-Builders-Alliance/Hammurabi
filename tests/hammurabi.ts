@@ -25,19 +25,11 @@ describe("anchor-amm-2023", () => {
   const seed1 = new BN(randomBytes(8));
   const seed2 = new BN(randomBytes(8));
 
-  // PDAs
-  const config1 = PublicKey.findProgramAddressSync([Buffer.from("config"), seed1.toBuffer().reverse()], program.programId)[0];
-  const config2 = PublicKey.findProgramAddressSync([Buffer.from("config"), seed2.toBuffer().reverse()], program.programId)[0];
-  const auth1 = PublicKey.findProgramAddressSync([Buffer.from("auth"), config1.toBuffer()], program.programId)[0];
-  const auth2 = PublicKey.findProgramAddressSync([Buffer.from("auth"), config2.toBuffer()], program.programId)[0];
-
   // Mints
   let mint_x: PublicKey;
   let mint_y: PublicKey;
   let mint_x2: PublicKey;
   let mint_y2: PublicKey;
-  let mint_lp = PublicKey.findProgramAddressSync([Buffer.from("lp"), config1.toBuffer()], program.programId)[0];
-  let mint_lp2 = PublicKey.findProgramAddressSync([Buffer.from("lp"), config2.toBuffer()], program.programId)[0];
 
   // ATAs
   let initializer_x_ata: PublicKey;
@@ -73,16 +65,6 @@ describe("anchor-amm-2023", () => {
     initializer_y_ata = u2.ata;
     initializer_z_ata = u3.ata;
 
-    initializer_lp_ata = await getAssociatedTokenAddress(mint_lp, initializer.publicKey, false, tokenProgram);
-    initializer_lp_ata2 = await getAssociatedTokenAddress(mint_lp2, initializer.publicKey, false, tokenProgram);
-    // Create take ATAs
-    vault_x1_ata = await getAssociatedTokenAddress(mint_x, auth1, true, tokenProgram);
-    vault_y_ata = await getAssociatedTokenAddress(mint_y, auth1, true, tokenProgram);
-    vault_x2_ata = await getAssociatedTokenAddress(mint_x2, auth2, true, tokenProgram);
-    vault_z_ata = await getAssociatedTokenAddress(mint_y2, auth2, true, tokenProgram);
-
-    vault_lp_ata = await getAssociatedTokenAddress(mint_lp, auth1, true, tokenProgram);
-    vault_lp_ata2 = await getAssociatedTokenAddress(mint_lp2, auth2, true, tokenProgram);
     // user_x_ata = await getAssociatedTokenAddress(mint_x, user.publicKey, false, tokenProgram);
     // user_y_ata = await getAssociatedTokenAddress(mint_y, user.publicKey, false, tokenProgram);
     // user_lp_ata = await getAssociatedTokenAddress(mint_lp, user.publicKey, false, tokenProgram);
@@ -92,6 +74,15 @@ describe("anchor-amm-2023", () => {
   // // let res = c.swap(LiquidityPair.X, BigInt(1000), BigInt(200));
 
   it("Initialize", async () => {
+
+    const config1 = PublicKey.findProgramAddressSync([Buffer.from("config"), mint_x.toBuffer(), mint_y.toBuffer()], program.programId)[0];
+    const auth1 = PublicKey.findProgramAddressSync([Buffer.from("auth"), config1.toBuffer()], program.programId)[0];
+    let mint_lp = PublicKey.findProgramAddressSync([Buffer.from("lp"), config1.toBuffer()], program.programId)[0];
+
+    vault_x1_ata = await getAssociatedTokenAddress(mint_x, auth1, true, tokenProgram);
+    vault_y_ata = await getAssociatedTokenAddress(mint_y, auth1, true, tokenProgram);
+    vault_lp_ata = await getAssociatedTokenAddress(mint_lp, auth1, true, tokenProgram);
+
     try {
       const tx = await program.methods.initialize(
         seed1,
@@ -122,6 +113,15 @@ describe("anchor-amm-2023", () => {
   });
 
   it ("Fund the Pool", async () => {
+    const config1 = PublicKey.findProgramAddressSync([Buffer.from("config"), mint_x.toBuffer(), mint_y.toBuffer()], program.programId)[0];
+    const auth1 = PublicKey.findProgramAddressSync([Buffer.from("auth"), config1.toBuffer()], program.programId)[0];
+    let mint_lp = PublicKey.findProgramAddressSync([Buffer.from("lp"), config1.toBuffer()], program.programId)[0];
+
+    vault_x1_ata = await getAssociatedTokenAddress(mint_x, auth1, true, tokenProgram);
+    vault_y_ata = await getAssociatedTokenAddress(mint_y, auth1, true, tokenProgram);
+    vault_lp_ata = await getAssociatedTokenAddress(mint_lp, auth1, true, tokenProgram);
+    initializer_lp_ata = await getAssociatedTokenAddress(mint_lp, initializer.publicKey, false, tokenProgram);
+    
     try {
       const tx = await program.methods.deposit(
         new BN(20),
@@ -161,6 +161,15 @@ describe("anchor-amm-2023", () => {
 
 
   it("Initialize2", async () => {
+    const config2 = PublicKey.findProgramAddressSync([Buffer.from("config"), mint_x2.toBuffer(), mint_y2.toBuffer()], program.programId)[0];
+    const auth2 = PublicKey.findProgramAddressSync([Buffer.from("auth"), config2.toBuffer()], program.programId)[0];
+    let mint_lp2 = PublicKey.findProgramAddressSync([Buffer.from("lp"), config2.toBuffer()], program.programId)[0];
+
+    // Create take ATAs
+    vault_x2_ata = await getAssociatedTokenAddress(mint_x2, auth2, true, tokenProgram);
+    vault_z_ata = await getAssociatedTokenAddress(mint_y2, auth2, true, tokenProgram);
+    vault_lp_ata2 = await getAssociatedTokenAddress(mint_lp2, auth2, true, tokenProgram);
+    
     try {
       const tx = await program.methods.initialize(
         seed2,
@@ -191,6 +200,16 @@ describe("anchor-amm-2023", () => {
   });
 
   it ("Fund the Pool 2", async () => {
+    const config2 = PublicKey.findProgramAddressSync([Buffer.from("config"), mint_x2.toBuffer(), mint_y2.toBuffer()], program.programId)[0];
+    const auth2 = PublicKey.findProgramAddressSync([Buffer.from("auth"), config2.toBuffer()], program.programId)[0];
+    let mint_lp2 = PublicKey.findProgramAddressSync([Buffer.from("lp"), config2.toBuffer()], program.programId)[0];
+
+    // Create take ATAs
+    vault_x2_ata = await getAssociatedTokenAddress(mint_x2, auth2, true, tokenProgram);
+    vault_z_ata = await getAssociatedTokenAddress(mint_y2, auth2, true, tokenProgram);
+    vault_lp_ata2 = await getAssociatedTokenAddress(mint_lp2, auth2, true, tokenProgram);
+    initializer_lp_ata2 = await getAssociatedTokenAddress(mint_lp2, initializer.publicKey, false, tokenProgram);
+    
     try {
       const tx = await program.methods.deposit(
         new BN(20),
@@ -229,6 +248,24 @@ describe("anchor-amm-2023", () => {
   });
 
   it ("Token to Token Swap", async () => {
+
+    const config1 = PublicKey.findProgramAddressSync([Buffer.from("config"), mint_x.toBuffer(), mint_y.toBuffer()], program.programId)[0];
+    const auth1 = PublicKey.findProgramAddressSync([Buffer.from("auth"), config1.toBuffer()], program.programId)[0];
+    let mint_lp = PublicKey.findProgramAddressSync([Buffer.from("lp"), config1.toBuffer()], program.programId)[0];
+
+    vault_x1_ata = await getAssociatedTokenAddress(mint_x, auth1, true, tokenProgram);
+    vault_y_ata = await getAssociatedTokenAddress(mint_y, auth1, true, tokenProgram);
+    vault_lp_ata = await getAssociatedTokenAddress(mint_lp, auth1, true, tokenProgram);
+
+    const config2 = PublicKey.findProgramAddressSync([Buffer.from("config"), mint_x2.toBuffer(), mint_y2.toBuffer()], program.programId)[0];
+    const auth2 = PublicKey.findProgramAddressSync([Buffer.from("auth"), config2.toBuffer()], program.programId)[0];
+    let mint_lp2 = PublicKey.findProgramAddressSync([Buffer.from("lp"), config2.toBuffer()], program.programId)[0];
+
+    // Create take ATAs
+    vault_x2_ata = await getAssociatedTokenAddress(mint_x2, auth2, true, tokenProgram);
+    vault_z_ata = await getAssociatedTokenAddress(mint_y2, auth2, true, tokenProgram);
+    vault_lp_ata2 = await getAssociatedTokenAddress(mint_lp2, auth2, true, tokenProgram);
+
     try {
       const tx = await program.methods.tokenToTokenSwap(
         new BN(100),
