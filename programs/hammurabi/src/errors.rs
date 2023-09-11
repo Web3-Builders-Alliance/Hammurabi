@@ -40,6 +40,10 @@ pub enum AmmError {
     InsufficientBalance,
     #[msg("Zero balance.")]
     ZeroBalance,
+    #[msg("Base token must be either USDC or Wrapped SOL")]
+    InvalidBaseToken,
+    #[msg("Both tokens in the pool can't be same")]
+    SameTokens
 }
 
 impl From<CurveError> for AmmError {

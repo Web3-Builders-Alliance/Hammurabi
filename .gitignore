@@ -9,3 +9,4 @@ node_modules
 test-ledger
 .yarn
 wallet.json
+shuk-test

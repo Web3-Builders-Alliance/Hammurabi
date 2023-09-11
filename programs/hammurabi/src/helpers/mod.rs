@@ -37,4 +37,16 @@ macro_rules! has_update_authority {
     };
 }
 
+#[macro_export]
+macro_rules! assert_different_tokens {
+    ($x:expr) => {
+        require_keys_neq!(
+            $x.mint_x.key(), 
+            $x.mint_y.key(), 
+            AmmError::SameTokens
+        );
+    };
+}
+
+
 

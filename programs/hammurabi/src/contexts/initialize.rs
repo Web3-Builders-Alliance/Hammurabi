@@ -5,6 +5,7 @@ use anchor_spl::token::{Mint, Token, TokenAccount};
 use anchor_spl::associated_token::AssociatedToken;
 use crate::errors::AmmError;
 use crate::state::config::Config;
+use crate::{constants::*, assert_different_tokens};
 
 #[derive(Accounts)]
 #[instruction(seed: u64)]
@@ -62,6 +63,16 @@ impl<'info> Initialize<'info> {
     ) -> Result<()> {
         // Don't charge >100.00% as a fee
         require!(fee <= 10000, AmmError::InvalidFee);
+        
+        // mint_x and mint_y must be different tokens
+        assert_different_tokens!(self);
+
+        // mint_x must be either USDC or Wrapped SOL
+        let mint_x_key = self.mint_x.key();
+
+        if !(BASE_TOKENS.contains(&mint_x_key)) {
+            return err!(AmmError::InvalidBaseToken);
+        }
 
         let (auth_bump, config_bump, lp_bump) = (
             *bumps.get("auth").ok_or(AmmError::BumpError)?,
