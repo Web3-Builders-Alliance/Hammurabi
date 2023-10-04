@@ -8,7 +8,7 @@ use crate::state::config::Config;
 
 #[derive(Accounts)]
 #[instruction(seed: u64)]
-pub struct Initialize<'info> {
+pub struct InitializePool<'info> {
     #[account(mut)]
     pub initializer: Signer<'info>,
     pub mint_x: Account<'info, Mint>,
@@ -52,7 +52,7 @@ pub struct Initialize<'info> {
     pub system_program: Program<'info, System>
 }
 
-impl<'info> Initialize<'info> {
+impl<'info> InitializePool<'info> {
     pub fn init(
         &mut self,
         bumps: &BTreeMap<String, u8>,

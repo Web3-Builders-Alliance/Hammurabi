@@ -13,14 +13,12 @@ declare_id!("ammmDN4bVS1pFRNc9SoH1bFbdJJcmnsNgmeoU6KhLag");
 pub mod hammurabi {
     use super::*;
 
-    pub fn initialize(
-        ctx: Context<Initialize>, 
-        seed: u64, 
-        fee: u16, // Fee as basis points
+    pub fn initialize_pair(
+        ctx: Context<InitializeTokenPair>, 
         authority: Option<Pubkey> // Update authority (if required)
     ) -> Result<()> {
-        // Initialise our AMM config
-        ctx.accounts.init(&ctx.bumps, seed, fee, authority)
+        // Initialise our TokenPair config
+        ctx.accounts.init(&ctx.bumps, authority)
     }
 
     pub fn deposit(

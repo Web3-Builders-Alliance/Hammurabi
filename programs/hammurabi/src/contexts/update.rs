@@ -2,6 +2,11 @@ use anchor_lang::prelude::*;
 use crate::has_update_authority;
 use crate::state::config::Config;
 use crate::errors::AmmError;
+<<<<<<< Updated upstream
+=======
+use anchor_spl::token::Mint;
+
+>>>>>>> Stashed changes
 
 #[derive(Accounts)]
 pub struct Update<'info> {

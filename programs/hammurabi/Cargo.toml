@@ -16,7 +16,15 @@ cpi = ["no-entrypoint"]
 default = []
 
 [dependencies]
+<<<<<<< Updated upstream
 anchor-lang = { git = "https://github.com/coral-xyz/anchor.git", features = ["init-if-needed"] }
 anchor-spl = { git = "https://github.com/coral-xyz/anchor.git" }
 constant-product-curve = { git = "https://github.com/deanmlittle/constant-product-curve.git" }
 solana-program = "1.16.9"
+=======
+anchor-lang = { git = "https://github.com/coral-xyz/anchor", features = [ "init-if-needed" ] }
+anchor-spl = { git = "https://github.com/coral-xyz/anchor" }
+solana-program = "=1.16.14"
+constant-product-curve = { git = "https://github.com/deanmlittle/constant-product-curve.git" }
+solana-address-lookup-table-program ="1.16.14"
+>>>>>>> Stashed changes

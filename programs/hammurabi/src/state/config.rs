@@ -3,39 +3,40 @@ use anchor_lang::prelude::*;
 
 #[account]
 pub struct Config {
-    pub seed:u64,
     pub authority: Option<Pubkey>,
     pub mint_x: Pubkey,           // Token X Mint
+    pub x_locked: u64,
     pub mint_y: Pubkey,           // Token Y Mint
-    pub fee: u16,                 // Swap fee in basis points
+    pub y_locked: u64,
     pub locked: bool,
-    pub auth_bump: u8,
     pub config_bump: u8,
-    pub lp_bump: u8
+    pub lut_address: Pubkey,
+    pub lut_bump: u8,
+    pub auth_bump: u8
 }
 
 impl Config {
-    pub const LEN: usize = 8 + U64_L + OPTION_L + (PUBKEY_L * 3) + U16_L + BOOL_L + (U8_L * 3);
+    pub const LEN: usize = 8 + (U64_L * 2) + OPTION_L + (PUBKEY_L * 4) + BOOL_L + (U8_L * 3);
 
     pub fn init(
         &mut self, 
-        seed: u64, 
         authority: Option<Pubkey>, 
         mint_x: Pubkey,
         mint_y: Pubkey,
-        fee: u16,
-        auth_bump: u8,
         config_bump: u8,
-        lp_bump: u8
+        lut_address: Pubkey,
+        lut_bump: u8,
+        auth_bump: u8
     ) {
-        self.seed = seed;
         self.authority = authority;
         self.mint_x = mint_x;
+        self.x_locked = 0;
         self.mint_y = mint_y;
-        self.fee = fee;
+        self.y_locked = 0;
         self.locked = false;
-        self.auth_bump = auth_bump;
         self.config_bump = config_bump;
-        self.lp_bump = lp_bump;
+        self.lut_address = lut_address;
+        self.lut_bump = lut_bump;
+        self.auth_bump = auth_bump;
     }
 }
