@@ -1,16 +1,15 @@
-# 🌍 Imagine a World with Better Decentralized Exchanges 🌍
+# 🌍 Imagine a DeFi protocol that put LPs as the focus 🌍
 
-What if everyone could access a decentralized exchange (DEX) that's swift, secure, and intuitive? What if liquidity providers didn't have to hemorrhage billions annually? That's the vision we're turning into reality at **Hammurabi**.
+In the intricate dance of DeFi, liquidity providers (LPs) should be the lead. Why should they stay in the shadows, suffering losses, when they play a pivotal role? **Hammurabi** lights up the stage for LPs, ensuring they not only shine but also thrive.
 
----
 
-## 🚀 Introducing Hammurabi: A Paradigm Shift in Cryptocurrency Trading 🚀
+## 🚀 Introducing Hammurabi: The Vanguard of Liquity Revolution 🚀
 
-Hammurabi aims to change the dynamics of cryptocurrency trading and our mission is:
+Hammurabi's vision is not about creating just another DeFi platform. It's about rewriting the rules, placing LPs at the heart of it all:
 
 _Liquid token swapping and abundant on-chain liquidity stand as the pillars of DeFi and numerous crypto applications. However, if liquidity providers persistently face losses, it could jeopardize and potentially halt a broad spectrum of crypto-economic activities. Therefore, our paramount mission is to protect and empower liquidity providers._
 
-To fullfill our mission we focus on 4 different pillar:
+**Translating this vision into reality: Hammurabi is built upon four game-changing pillars:**
 
 - 💡 **Beginner-Friendly**: An intuitive UI makes it a breeze to locate assets and place trades.
 
@@ -18,9 +17,8 @@ To fullfill our mission we focus on 4 different pillar:
   
 - 🌐 **Permissionless Interoperable LPs**: Move your LP tokens wherever you want, and capitalize on strategy stacking. It's a game-changer for LPs, unlocking avenues for maximum fee generation.
 
-- 🔄 **Universal Trading**: Trade any cryptocurrency, on any chain, with anyone globally, minus the third-party trust issues.
+- 💬 **SOCIAL VAULT**: Revolutionizing SocialFi, we provide traders a playground to devise, test, and refine their strategies. Once proven, these strategies are opened up to our user base, ensuring a community-driven, optimized trading experience.
 
----
 
 ## 🛠 Current Functionalities available for HYPERDRIVE HACKATHON:
 
@@ -30,8 +28,7 @@ To fullfill our mission we focus on 4 different pillar:
 
 - **Dynamic Deposit Function [_WIP - reference L0STE branch_]**: This functionality enables LPs to deposit in a pool that aligns closely with current trading conditions. It simplifies the rebalancing of your position and decelerates trading in out-of-balance pools (Such pools still process trades but with heftier fees, ensuring increased revenue for LPs without jeopardizing their positions excessively).
 
-- **Testing Alogrithm for Other DeFi Strategies**: We created a Tool that other DeFi Protocol can use to test their strategies. Our Algorithm analyze both Arbitrage Opportunity, by referencing a "Cex Price" calulated leveraging a Binomial Price Model that i speedy, dependable and not data-heavy, and User Habits, by mirroring user trades by sourcing them from Price Aggregator like Jup.Ag and mimicking what would happen in the real world by acting only on the best price through all the compared strategies. 
-    **[_Our current WIP data analysis]**: 
+- **Testing Alogrithm for Other DeFi Strategies**: We created a Tool that other DeFi Protocol can use to test their strategies. Our Algorithm analyze both Arbitrage Opportunity, by referencing a "Cex Price" calulated leveraging a Binomial Price Model that i speedy, dependable and not data-heavy, and User Habits, by mirroring user trades by sourcing them from Price Aggregator like Jup.Ag and mimicking what would happen in the real world by acting only on the best price through all the compared strategies. Currently we're wokring on shipping the 3 first functionalities of our Analysis Alogrithm
     - **Markout Calculation** on every current amm or customized strategies
     - **Strategy Testing Against Current Market Standard** like fixed fee pool, ...
     - **Resistance Against LVR Test**: calculate how much money your strategy loose against arbitrageurs 
