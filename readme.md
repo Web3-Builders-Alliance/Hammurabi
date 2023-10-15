@@ -22,7 +22,7 @@ _Liquid token swapping and abundant on-chain liquidity stand as the pillars of D
 
 ## 🛠 Current Functionalities available for HYPERDRIVE HACKATHON:
 
-- **Curve Library Built in wasm**: For all our calculations, we've crafted an interoperable curve that functions both in Rust and in Typescript using wasm. This interoperability is crucial as it enables smooth integration between contract and frontend/server/bots. Tasks such as routing, slippage, swap, and fee calculations can now be effortlessly executed off-chain. Just query our PDAs to fetch the latest pool data. [Find out more HERE] (https://github.com/deanmlittle/constant-product-curve)
+- **Curve Library Built in wasm**: For all our calculations, we've crafted an interoperable curve that functions both in Rust and in Typescript using wasm. This interoperability is crucial as it enables smooth integration between contract and frontend/server/bots. Tasks such as routing, slippage, swap, and fee calculations can now be effortlessly executed off-chain. Just query our PDAs to fetch the latest pool data. [Find out more HERE](https://github.com/deanmlittle/constant-product-curve)
 
 - **Dynamic Fee via Curve Library**: Our system is ingeniously devised to magnify returns for passive liquidity providers and simultaneously ensure conducive trading conditions. How do we achieve this balance? Trades that aid in pool rebalancing are given discounted fees, while those which might disturb market-making are levied with higher fees. This dual-action system provides a robust defense against market volatility. 
 
