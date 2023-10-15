@@ -32,4 +32,4 @@ _Liquid token swapping and abundant on-chain liquidity stand as the pillars of D
     - **Markout Calculation** on every current amm or customized strategies
     - **Strategy Testing Against Current Market Standard** like fixed fee pool, ...
     - **Resistance Against LVR Test**: calculate how much money your strategy loose against arbitrageurs 
-[Find out more HERE] (https://github.com/ASCorreia/Hamm-Algo)
+[Find out more HERE](https://github.com/ASCorreia/Hamm-Algo)
