@@ -11,7 +11,7 @@ _Liquid token swapping and abundant on-chain liquidity stand as the pillars of D
 
 **Translating this vision into reality: Hammurabi is built upon four game-changing pillars:**
 
-- 💡 **Beginner-Friendly**: An intuitive UI makes it a breeze to locate assets and place trades.
+- 💡 **Beginner-Friendly**: An intuitive UI makes it a breeze to locate assets and place trades. [Find out more HERE](https://github.com/Web3-Builders-Alliance/Hammurabi-UI)
 
 - 🥱 **For "Lazy" Liquidity Provider**: Our cutting-edge matching algorithm rejuvenates pool rebalancing with a dynamic fee system. The result? A "Lazy mode" for liquidity providers to minimize loss-prone rebalancing and boost fee generation.
   
